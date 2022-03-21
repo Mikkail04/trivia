@@ -5,20 +5,24 @@ import data from "../sample_data.json";
 function App() {
   console.log(data[0].question.text);
   const [questionNum, setQuestNum] = useState(0);
-
   const [answerDisplayed, setDisplay] = useState(false);
+  const [select, setSelect] = useState(null);
+
   return (
     <div className="app">
       Trivia!
       <Question
         question={data[questionNum].question.text}
         answers={data[questionNum].question}
+        select={() => setSelect}
+        display={() => setDisplay(true)}
       />
-      <button onClick={() => setDisplay(true)}>
+      {/* <button onClick={() => setDisplay(true)}>
         Click for the correct answer
-      </button>
+      </button> */}
       <ShowAnswer
         display={answerDisplayed}
+        select={select}
         correct={
           data[questionNum].question.choices[
             data[questionNum].question.correct_choice_index
@@ -38,7 +42,12 @@ function Question(props) {
     <div>
       <p className="question">{props.question}</p>
       {props.answers.choices.map((answer) => (
-        <Answers answers={answer} />
+        <Answers
+          check={props.select()}
+          clicked={answer}
+          display={props.display}
+          answers={answer}
+        />
       ))}
     </div>
   );
@@ -62,14 +71,39 @@ function NextQuestion(props) {
 }
 
 function Answers(props) {
-  return <div> {props.answers} </div>;
+  return (
+    <div
+      onClick={() => {
+        props.check(props.clicked);
+        props.display();
+      }}
+    >
+      {" "}
+      {props.answers}{" "}
+    </div>
+  );
 }
 
 function ShowAnswer(props) {
   if (props.display) {
-    return <p> The correct answer is {props.correct} </p>;
+    if (props.select === props.correct) {
+      return (
+        <p>
+          {" "}
+          Correct! You clicked {props.select}, which is the correct answer!{" "}
+        </p>
+      );
+    } else {
+      return (
+        <p>
+          {" "}
+          Wrong! You clicked {props.select}. The correct answer is{" "}
+          {props.correct}!{" "}
+        </p>
+      );
+    }
   } else {
-    return <p> The correct answer is unanswered</p>;
+    return null;
   }
 }
 export default App;
