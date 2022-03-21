@@ -4,8 +4,7 @@ import data from "../sample_data.json";
 
 function App() {
   console.log(data[0].question.text);
-  let questionNum = 0;
-  let answerIndex = data[questionNum].question.correct_choice_index;
+  const [questionNum, setQuestNum] = useState(0);
 
   const [answerDisplayed, setDisplay] = useState(false);
   return (
@@ -20,9 +19,17 @@ function App() {
       </button>
       <ShowAnswer
         display={answerDisplayed}
-        correct={data[questionNum].question.choices[answerIndex]}
+        correct={
+          data[questionNum].question.choices[
+            data[questionNum].question.correct_choice_index
+          ]
+        }
       />
-      <NextQuestion />
+      <NextQuestion
+        next={() => setQuestNum(questionNum + 1)}
+        hide={() => setDisplay(false)}
+        num={questionNum}
+      />
     </div>
   );
 }
@@ -38,7 +45,20 @@ function Question(props) {
 }
 
 function NextQuestion(props) {
-  return <button>Next Question</button>;
+  if (props.num < data.length - 1) {
+    return (
+      <button
+        onClick={() => {
+          props.next();
+          props.hide();
+        }}
+      >
+        Next Question
+      </button>
+    );
+  } else {
+    return null;
+  }
 }
 
 function Answers(props) {
